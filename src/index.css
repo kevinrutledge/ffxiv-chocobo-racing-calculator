@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/* FFXIV-inspired palette and fonts, exposed as Tailwind theme tokens. */
+@theme {
+  --color-hud: #12141c;
+  --color-panel: #1c2233;
+  --color-navy: #2d3a80;
+  --color-accent: #4c7ee8;
+  --color-gold: #bfa34c;
+  --color-green: #346624;
+  --color-green-bright: #6fbf4f;
+  --color-red: #732828;
+  --color-red-bright: #e06a6a;
+  --color-cream: #e8e2d0;
+  --color-muted: #a8a090;
+  --font-display: 'Cinzel', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-hud);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+}
+
+/* Hide the native number-input spinners; typing and the +/- steppers are enough. */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Visible keyboard focus on every interactive element. */
+:where(a, button, input, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Center the modal dialog (browsers position it with inset:0; margin:auto centers the
+   box within that) and dim the page behind it. */
+dialog {
+  margin: auto;
+}
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.6);
+}

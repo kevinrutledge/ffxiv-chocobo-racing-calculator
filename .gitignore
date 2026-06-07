@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+*.local
+.DS_Store
+
+# LaTeX build artifacts (the .tex source and .pdf are tracked)
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.log
+*.toc
+*.synctex.gz
