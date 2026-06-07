@@ -16,6 +16,7 @@ import { parseState } from '../src/schema/state.ts'
 import { advise } from '../src/math/advisor.ts'
 import { formatPercent, formatOdds } from '../src/format.ts'
 import { STAT_NAMES } from '../src/types/stats.ts'
+import { MAX_RANK, NUM_STATS, SLOTS } from '../src/math/model.ts'
 
 const docsDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs')
 
@@ -31,10 +32,14 @@ server.registerTool(
       'of 5, in the order Maximum Speed, Acceleration, Endurance, Stamina, Cunning. ' +
       'dumpIndex is which attribute (0 to 4) is the dump.',
     inputSchema: {
-      rank: z.number().int().min(1).max(50),
-      values: z.array(z.number().int()).length(5),
-      dumpIndex: z.number().int().min(0).max(4),
-      slotsSpent: z.number().int().min(0).max(50).optional(),
+      rank: z.number().int().min(1).max(MAX_RANK),
+      values: z.array(z.number().int()).length(NUM_STATS),
+      dumpIndex: z
+        .number()
+        .int()
+        .min(0)
+        .max(NUM_STATS - 1),
+      slotsSpent: z.number().int().min(0).max(SLOTS).optional(),
     },
   },
   async ({ rank, values, dumpIndex, slotsSpent }) => {
@@ -42,9 +47,7 @@ server.registerTool(
     if (state === null) {
       return {
         isError: true,
-        content: [
-          { type: 'text', text: 'Invalid chocobo state. Values must be 55 to 500 in steps of 5.' },
-        ],
+        content: [{ type: 'text', text: 'Invalid chocobo state. Values must be 55 to 500 in steps of 5.' }],
       }
     }
     const result = advise(state)
@@ -90,9 +93,7 @@ server.registerResource(
     mimeType: 'text/x-tex',
   },
   async (uri) => ({
-    contents: [
-      { uri: uri.href, text: readFileSync(join(docsDir, 'chocobo-racing-probability.tex'), 'utf8') },
-    ],
+    contents: [{ uri: uri.href, text: readFileSync(join(docsDir, 'chocobo-racing-probability.tex'), 'utf8') }],
   }),
 )
 

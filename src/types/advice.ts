@@ -21,6 +21,14 @@ export interface TargetAdvice {
   label: string
 }
 
+/** Feed-slot availability for the current state. */
+export interface FeedsSummary {
+  /** Feeds available to spend right now, the current rank minus those already spent. */
+  availableNow: number
+  /** Feeds available by rank 50, the 50-slot lifetime total minus those already spent. */
+  lifetime: number
+}
+
 /** Everything the advisor computes from a chocobo state. */
 export interface AdviceResult {
   /** Headline outlook for the four-target goal. */
@@ -37,6 +45,8 @@ export interface AdviceResult {
   segment: AdviceSegment
   /** The top-line advice or status summary. */
   headline: string
-  /** Per-target checklist; empty in the early segment or when no targets remain. */
+  /** Per-target checklist, empty in the early segment or when no targets remain. */
   targetAdvice: TargetAdvice[]
+  /** Feed-slot accounting for the four targets. */
+  feeds: FeedsSummary
 }

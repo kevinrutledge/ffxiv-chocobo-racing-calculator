@@ -14,15 +14,15 @@ const LANCZOS_COEFFICIENTS = [
 /**
  * Natural log of the Gamma function via the Lanczos approximation.
  *
- * @param x - positive real argument
+ * @param value - positive real argument
  *
- * @returns ln Gamma(x), with relative error about 1e-13 for x > 0
+ * @returns the natural log of the Gamma function at value, accurate to about 1e-13 for positive input
  */
-export function logGamma(x: number): number {
-  if (x < 0.5) {
-    return Math.log(Math.PI / Math.sin(Math.PI * x)) - logGamma(1 - x)
+export function logGamma(value: number): number {
+  if (value < 0.5) {
+    return Math.log(Math.PI / Math.sin(Math.PI * value)) - logGamma(1 - value)
   }
-  const shifted = x - 1
+  const shifted = value - 1
   let series = LANCZOS_COEFFICIENTS[0]
   const scaled = shifted + LANCZOS_ORDER + 0.5
   for (let i = 1; i < LANCZOS_ORDER + 2; i++) {
@@ -31,9 +31,9 @@ export function logGamma(x: number): number {
   return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(scaled) - scaled + Math.log(series)
 }
 
-/** Natural log of n factorial (logGamma of n + 1). */
-export function logFactorial(n: number): number {
-  return logGamma(n + 1)
+/** Natural log of the factorial of count (logGamma of count plus 1). */
+export function logFactorial(count: number): number {
+  return logGamma(count + 1)
 }
 
 /** Natural log of the binomial coefficient (total choose chosen). */

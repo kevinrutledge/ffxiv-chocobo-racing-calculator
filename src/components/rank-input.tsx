@@ -36,7 +36,7 @@ export function RankInput({ rank, onChange }: RankInputProps) {
             min={1}
             max={MAX_RANK}
             value={rank}
-            onChange={(e) => setRank(Number(e.target.value))}
+            onChange={(event) => setRank(Number(event.target.value))}
             className={`w-16 ${NUMBER_FIELD}`}
           />
           <span className="text-sm text-muted">/ {MAX_RANK}</span>
@@ -53,7 +53,7 @@ export function RankInput({ rank, onChange }: RankInputProps) {
         min={1}
         max={MAX_RANK}
         value={rank}
-        onChange={(e) => setRank(Number(e.target.value))}
+        onChange={(event) => setRank(Number(event.target.value))}
         aria-label="Rank slider"
         className="w-full accent-accent"
       />

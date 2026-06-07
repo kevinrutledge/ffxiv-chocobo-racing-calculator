@@ -9,20 +9,30 @@ interface AttributeBarProps {
   value: number
   /** Whether this attribute is the dump. */
   isDump: boolean
+  /** Grade-3 feeds applied to this attribute. */
+  feeds: number
+  /** Whether another feed is allowed (value below the cap and feeds within the rank budget). */
+  canFeedUp: boolean
   /** Set the value directly (from the number field). */
   onSetValue: (value: number) => void
   /** Adjust the value by a delta (from the +/- steppers). */
   onNudge: (delta: number) => void
+  /** Apply one Grade-3 feed. */
+  onFeedUp: () => void
+  /** Remove one Grade-3 feed. */
+  onFeedDown: () => void
 }
 
 /**
- * One attribute as a fill bar with a typed number field and +/-5 and +/-15 steppers.
- * A target fills toward 500 in accent blue (gold when maxed) and shows the points left
- * and whether the gap is divisible by 15. The dump fills toward its 250 ceiling in gold
- * and shows the room left. Going over 250 fails the lineup and is shown in red. Either
- * way the value may be entered up to 500.
+ * One attribute row. On the left the value field and +/-5 and +/-15 steppers enter the
+ * random growth. On the right a Grade-3 feed control adds or removes one feed at a time,
+ * each moving the full value by 15. The two groups wrap onto separate lines when the row is
+ * too narrow rather than overlapping. A target fills toward 500 in accent blue (gold when
+ * maxed) and shows the points left and whether the gap is divisible by 15. The dump fills
+ * toward its 250 ceiling in gold, shows the room left, turns red over 250, and has no feed
+ * control since the dump is never fed.
  */
-export function AttributeBar({ name, value, isDump, onSetValue, onNudge }: AttributeBarProps) {
+export function AttributeBar({ name, value, isDump, feeds, canFeedUp, onSetValue, onNudge, onFeedUp, onFeedDown }: AttributeBarProps) {
   const reference = isDump ? DUMP_VALUE_CAP : CAP
   const pct = Math.min(100, Math.round((value / reference) * 100))
   const atCap = value >= CAP
@@ -76,29 +86,50 @@ export function AttributeBar({ name, value, isDump, onSetValue, onNudge }: Attri
         <div className={`h-full ${fillColor}`} style={{ width: `${pct}%` }} />
       </div>
 
-      <div className="flex items-center gap-1.5">
-        <button type="button" className={STEP_BUTTON} onClick={() => onNudge(-15)} disabled={value <= START_VALUE}>
-          -15
-        </button>
-        <button type="button" className={STEP_BUTTON} onClick={() => onNudge(-5)} disabled={value <= START_VALUE}>
-          -5
-        </button>
-        <input
-          type="number"
-          step={5}
-          min={START_VALUE}
-          max={CAP}
-          value={value}
-          onChange={(e) => onSetValue(Number(e.target.value))}
-          aria-label={`${name} value`}
-          className={`w-20 ${NUMBER_FIELD}`}
-        />
-        <button type="button" className={STEP_BUTTON} onClick={() => onNudge(5)} disabled={atCap}>
-          +5
-        </button>
-        <button type="button" className={STEP_BUTTON} onClick={() => onNudge(15)} disabled={atCap}>
-          +15
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <button type="button" className={STEP_BUTTON} onClick={() => onNudge(-15)} disabled={value <= START_VALUE}>
+            -15
+          </button>
+          <button type="button" className={STEP_BUTTON} onClick={() => onNudge(-5)} disabled={value <= START_VALUE}>
+            -5
+          </button>
+          <input
+            type="number"
+            step={5}
+            min={START_VALUE}
+            max={CAP}
+            value={value}
+            onChange={(event) => onSetValue(Number(event.target.value))}
+            aria-label={`${name} value`}
+            className={`w-20 ${NUMBER_FIELD}`}
+          />
+          <button type="button" className={STEP_BUTTON} onClick={() => onNudge(5)} disabled={atCap}>
+            +5
+          </button>
+          <button type="button" className={STEP_BUTTON} onClick={() => onNudge(15)} disabled={atCap}>
+            +15
+          </button>
+        </div>
+        {!isDump ? (
+          <span className="flex items-center gap-1">
+            <button
+              type="button"
+              className={STEP_BUTTON}
+              onClick={onFeedDown}
+              disabled={feeds <= 0}
+              aria-label={`Remove a feed from ${name}`}
+            >
+              -
+            </button>
+            <span className="min-w-[4ch] text-center text-sm tabular-nums text-cream" aria-label={`${name} feeds`}>
+              {feeds} fed
+            </span>
+            <button type="button" className={STEP_BUTTON} onClick={onFeedUp} disabled={!canFeedUp} aria-label={`Feed ${name}`}>
+              +
+            </button>
+          </span>
+        ) : null}
       </div>
     </div>
   )

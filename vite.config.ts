@@ -7,7 +7,24 @@ export default defineConfig({
   base: '/ffxiv-chocobo-racing-calculator/',
   plugins: [react(), tailwindcss()],
   test: {
-    include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
-    environment: 'node',
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          include: ['test/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          include: ['test/**/*.test.tsx'],
+          environment: 'jsdom',
+          setupFiles: ['./test/setup/jsdom.ts'],
+        },
+      },
+    ],
   },
 })

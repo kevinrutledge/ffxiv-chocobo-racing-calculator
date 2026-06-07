@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { advise, fourFixedDumpFromState, onlineFromStateAdvisor, deterministicSuccess, abandon } from '../../src/math/advisor.ts'
+import {
+  advise,
+  fourFixedDumpFromState,
+  onlineFromStateAdvisor,
+  deterministicSuccess,
+  abandon,
+  feedsFromState,
+} from '../../src/math/advisor.ts'
 import { fourFixedDump, onlineOptimum } from '../../src/math/index.ts'
-import { FRESH, GUARANTEED, DOOMED, DUMP_OVER, makeState } from '../mocks/state.ts'
+import { FRESH, GUARANTEED, DOOMED, DUMP_OVER, UNLIKELY, makeState } from '../mocks/state.ts'
 
 describe('conditional evaluators reduce to the fixed-end anchors at rank 1', () => {
   it('four-fixed-dump from the fresh state equals 2.301513%', () => {
@@ -39,6 +46,26 @@ describe('perfect-lineup reachability', () => {
     expect(result.perfectReachable).toBe(false)
     expect(result.onlineLe250).toBe(0)
     expect(result.onlineEq250).toBe(0)
+  })
+
+  it('reports four-maxed as impossible once the dump passes 250', () => {
+    const state = makeState({ rank: 45, values: [300, 260, 300, 300, 300] })
+    expect(fourFixedDumpFromState(state)).toBe(0)
+    expect(advise(state).status).toBe('doomed')
+  })
+})
+
+describe('feeds availability', () => {
+  it('reports feeds available now (rank minus spent) and the lifetime by rank 50', () => {
+    const feeds = feedsFromState(makeState({ rank: 30, slotsSpent: 4 }))
+    expect(feeds.availableNow).toBe(26) // 30 accrued minus 4 spent
+    expect(feeds.lifetime).toBe(46) // 50 lifetime minus 4 spent
+  })
+
+  it('is carried on the advise result', () => {
+    const feeds = advise(GUARANTEED).feeds
+    expect(feeds.availableNow).toBe(48) // rank 48, none spent
+    expect(feeds.lifetime).toBe(50)
   })
 })
 
@@ -80,13 +107,6 @@ describe('advise keeps the probabilities consistent', () => {
 })
 
 describe('practically-hopeless band', () => {
-  const UNLIKELY = makeState({
-    rank: 47,
-    slotsSpent: 49,
-    values: [470, 200, 470, 485, 485],
-    dumpIndex: 1,
-  })
-
   it('flags a very-low-but-possible state as unlikely', () => {
     const result = advise(UNLIKELY)
     expect(result.status).toBe('unlikely')

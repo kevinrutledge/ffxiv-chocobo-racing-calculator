@@ -32,6 +32,7 @@ import {
   type AdviceSegment,
   type TargetAdvice,
   type AdviceResult,
+  type FeedsSummary,
 } from '../types/index.ts'
 
 /** Indices of the targets (non-dump) that are not yet maxed. */
@@ -54,6 +55,10 @@ function liveTargetIndices(state: ChocoboState): number[] {
  * @returns the success probability from here
  */
 export function fourFixedDumpFromState(state: ChocoboState): number {
+  // The dump only grows, so once it passes 250 the four-maxed lineup (dump at most 250) is lost.
+  if (state.values[state.dumpIndex] > DUMP_VALUE_CAP) {
+    return 0
+  }
   if (deterministicSuccess(state)) {
     return 1
   }
@@ -194,6 +199,21 @@ export function abandon(state: ChocoboState): boolean {
   return totalDeficit > maxGain
 }
 
+/**
+ * Feed-slot availability. availableNow is the slots in hand at the current rank, lifetime is
+ * the slots by rank 50, each net of the feeds already spent.
+ *
+ * @param state - the current chocobo state
+ *
+ * @returns the feeds available now and the lifetime feeds
+ */
+export function feedsFromState(state: ChocoboState): FeedsSummary {
+  return {
+    availableNow: state.rank - state.slotsSpent,
+    lifetime: SLOTS - state.slotsSpent,
+  }
+}
+
 /** At or below this rank no locking is ever optimal, so advice stays limited. */
 const EARLY_MAX_RANK = 40
 
@@ -239,7 +259,7 @@ function buildAdvice(
     if (status === 'unlikely') {
       headline = UNLIKELY_HEADLINE
     } else {
-      headline = 'Keep racing. It is too early to feed. Early feeding only pushes the dump up, so just watch that it stays below 250.'
+      headline = 'Keep racing. It is too early to feed, since feed-last is optimal. Just watch that the dump stays at or below 250.'
     }
     return { segment, headline, targetAdvice: [] }
   }
@@ -314,5 +334,6 @@ export function advise(state: ChocoboState): AdviceResult {
     segment,
     headline,
     targetAdvice,
+    feeds: feedsFromState(state),
   }
 }

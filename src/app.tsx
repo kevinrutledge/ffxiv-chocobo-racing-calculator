@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useReducer, useState } from 'react'
-import { inputReducer, initialState } from './state/input-reducer.ts'
+import { inputReducer, initialInput, toChocoboState, canFeed } from './state/input-reducer.ts'
 import { encodeState, decodeParams } from './state/url.ts'
-import { parseState } from './schema/state.ts'
+import { parseInput } from './schema/state.ts'
 import { STAT_NAMES } from './types/stats.ts'
 import { advise } from './math/advisor.ts'
 import { RankInput } from './components/rank-input.tsx'
 import { AttributeBar } from './components/attribute-bar.tsx'
 import { DumpSelector } from './components/dump-selector.tsx'
+import { FeedsPanel } from './components/feeds-panel.tsx'
 import { OddsPanel } from './components/odds-panel.tsx'
 import { AdvicePanel } from './components/advice-panel.tsx'
 import { ConfirmDialog } from './components/confirm-dialog.tsx'
 import { SECONDARY_BUTTON } from './components/styles.ts'
 
-/** Root component: the input form (left) and the Odds and Advice panels (right). */
+/** Root component: the input form (left) and the Feeds, Odds, and Advice panels (right). */
 export default function App() {
-  const [state, dispatch] = useReducer(inputReducer, initialState, () => parseState(decodeParams(window.location.search)) ?? initialState)
-  const result = useMemo(() => advise(state), [state])
+  const [state, dispatch] = useReducer(inputReducer, initialInput, () => parseInput(decodeParams(window.location.search)) ?? initialInput)
+  const result = useMemo(() => advise(toChocoboState(state)), [state])
 
   useEffect(() => {
     window.history.replaceState(null, '', '?' + encodeState(state))
@@ -30,7 +31,7 @@ export default function App() {
         <p className="mt-1 text-sm text-muted">Enter your chocobo's current rank and attribute values to see your odds from here.</p>
       </header>
 
-      <div className="grid items-start gap-6 md:grid-cols-2">
+      <div className="grid items-start gap-6 min-[845px]:grid-cols-2">
         <section>
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="font-display text-lg text-gold">Your chocobo</h2>
@@ -38,7 +39,7 @@ export default function App() {
               Reset
             </button>
           </div>
-          <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-5">
+          <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-5">
             <RankInput rank={state.rank} onChange={(rank) => dispatch({ type: 'setRank', rank })} />
             <DumpSelector dumpIndex={state.dumpIndex} onChange={(index) => dispatch({ type: 'setDump', index })} />
             <div role="group" aria-labelledby="attrs-heading" className="flex flex-col gap-2">
@@ -51,15 +52,20 @@ export default function App() {
                   name={name}
                   value={state.values[i]}
                   isDump={i === state.dumpIndex}
+                  feeds={state.feeds[i]}
+                  canFeedUp={canFeed(state, i)}
                   onSetValue={(value) => dispatch({ type: 'setValue', index: i, value })}
                   onNudge={(delta) => dispatch({ type: 'nudgeValue', index: i, delta })}
+                  onFeedUp={() => dispatch({ type: 'feedUp', index: i })}
+                  onFeedDown={() => dispatch({ type: 'feedDown', index: i })}
                 />
               ))}
             </div>
           </form>
         </section>
 
-        <div className="flex flex-col gap-6 md:sticky md:top-6">
+        <div className="flex flex-col gap-6 min-[845px]:sticky min-[845px]:top-6">
+          <FeedsPanel feeds={result.feeds} />
           <OddsPanel result={result} />
           <AdvicePanel result={result} />
         </div>

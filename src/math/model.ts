@@ -82,3 +82,8 @@ export function isGrade3Window(value: number): boolean {
 export function residue(count: number): number {
   return count % 3
 }
+
+/** Total feed slots used across all attributes. */
+export function totalFeeds(feeds: number[]): number {
+  return feeds.reduce((sum, count) => sum + count, 0)
+}

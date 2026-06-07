@@ -113,10 +113,13 @@ EXP scales off the 1st-place reward, with `BaseReward = FirstPlaceReward × fact
   - Grade 1 gives **+1%** for 1,500 gil (or Lv.30 Culinarian craft)
   - Grade 2 gives **+2%** for 610 MGP (Special) (or Lv.50 Culinarian)
   - Grade 3 gives **+3%** for 1,345 MGP (Special, MGP only)
-- **Training Capacity.** A chocobo **starts with 1 slot and gains 1 per
-  rank-up**, so a rank-50 chocobo can use **up to 50 feeds** total. Every feed
-  uses **1 slot regardless of grade**.
-- **Feeds stockpile.** You can save slots and feed in batches or at the end.
+- **Training Capacity.** A chocobo **starts with 1 slot at rank 1 and gains 1 more
+  at each rank-up**, so the slots available at a given rank equal that rank (1 at
+  rank 1, 2 at rank 2, and so on), reaching the **50-slot maximum only at rank 50**.
+  Every feed uses **1 slot regardless of grade**.
+- **Feeds stockpile.** Unused slots carry forward, so at any rank you hold that
+  rank's slots minus the ones already spent. You may feed in batches or save
+  everything for the end.
 - Feeding **raises stats but not rating**, and training **does NOT carry to
   offspring** (short-term investment only, so don't feed low-pedigree birds).
 

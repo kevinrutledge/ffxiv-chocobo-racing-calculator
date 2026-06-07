@@ -38,10 +38,10 @@ export function AdvicePanel({ result }: AdvicePanelProps) {
 
       {result.targetAdvice.length > 0 ? (
         <ul className="mt-3 flex flex-col gap-1">
-          {result.targetAdvice.map((t) => (
-            <li key={t.index} className="flex justify-between gap-2 text-sm">
-              <span className="text-cream">{STAT_NAMES[t.index]}</span>
-              <span className={ACTION_CLASS[t.action]}>{t.label}</span>
+          {result.targetAdvice.map((target) => (
+            <li key={target.index} className="flex justify-between gap-2 text-sm">
+              <span className="text-cream">{STAT_NAMES[target.index]}</span>
+              <span className={ACTION_CLASS[target.action]}>{target.label}</span>
             </li>
           ))}
         </ul>
