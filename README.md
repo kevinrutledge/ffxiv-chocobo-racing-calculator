@@ -14,7 +14,7 @@ four-capped from here, along with what to do next.
 
 ## Preview
 
-<img src="assets/screenshot.png" alt="Perfect Chocobo Advisor" width="725" />
+<img src="public/og-image.png" alt="Perfect Chocobo Advisor" width="725" />
 
 ## Features
 
